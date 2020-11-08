@@ -1,14 +1,13 @@
 import discord
 from discord.ext import tasks
 from selenium.webdriver.firefox.options import Options
-from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
 import time
 
 client=discord.Client()
-src=open(LAST_LINK.TXT,"r")
+src=open(LAST_LINK.TXT,"r")                         #FILE WITH LATEST LINK
 last_link=src.read()
 src.close()
 
@@ -19,10 +18,10 @@ async def main(id_channel=ID):
         options = Options()
         options.headless = True
         driver = webdriver.Firefox(options=options)
-        driver.set_page_load_timeout(180)
+        driver.set_page_load_timeout(TIMEOUT)
         driver.get(LINK)
-        code=driver.find_element_by_xpath(XPATH).get_attribute('outerHTML')
-        blocks=code.split(sep="<")
+        code=driver.find_element_by_xpath(XPATH).get_attribute('outerHTML')     #WRITE HTML CODE
+        blocks=code.split(sep="<")                  #SPLIT THE CODE
         link="https://www.instagram.com"+blocks[2].split()[1][6:-1]
         driver.close()
         return link
@@ -31,10 +30,9 @@ async def main(id_channel=ID):
     global last_link
     account=PROFILE
 
-    link=last_post("https://www.instagram.com/"+account.replace("@","")+"/")
+    link=last_post("https://www.instagram.com/"+account.replace("@","")+"/")                #@profile_name ---> profile_name
 
     if link!=last_link:
-        print("###!NEW POST!###")
         last_link=link
         backup=open(LAST_LINK.TXT,"w")
         backup.write(last_link)
@@ -52,13 +50,12 @@ async def main(id_channel=ID):
         with open(name,'wb') as f: 
             f.write(r.content)
         driver.close()
-        print("Sending")
-        await channel.send(f"@everyone Last post from {account}\n{link}", file=discord.File(name))
+        await channel.send(f"@everyone Last post from {account}\n{link}", file=discord.File(name))          #Send message for everyone
 
 @client.event
 async def on_ready():
     print(f"Logged in as {client.user.name} [{client.user.id}]")
-    return await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=PAGE))
     main.start()
+    return await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=PAGE))
 
 client.run(TOKEN)

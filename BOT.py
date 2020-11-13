@@ -136,4 +136,4 @@ async def on_ready():
         quit()
     return await client.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=account))
 
-client.run(TOKEN)
+client.run(TOKEN) 
